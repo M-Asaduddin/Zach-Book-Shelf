@@ -18,13 +18,31 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
 });
 
+document.addEventListener(RENDER_EVENT, ()=>{
+    const incompleted = document.getElementById("incompleteBookshelfList");
+    incompleted.innerHTML = '';
+
+    const completed = document.getElementById("completeBookshelfList");
+    completed.innerHTML = '';
+
+    for(const book of readlist){
+        const bookItem = renderReadlist(book);
+
+        if(book.isCompleted){
+            completed.append(bookItem);
+        } else {
+            incompleted.append(bookItem);
+        }
+    }
+});
+
 const addReadList = () => {
     const bookTitle = document.getElementById('inputBookTitle').value;
     const bookAuthor = document.getElementById('inputBookAuthor').value;
     const bookYear = document.getElementById('inputBookYear').value;
     const bookIsComplete = document.getElementById('inputBookIsComplete').value;
 
-    const readlistObject = generateReadList(+new Date(), bookTitle, bookAuthor, bookYear, bookIsComplete);
+    const readlistObject = generateReadList(+new Date(), bookTitle, bookAuthor, bookYear, false);
 
     readlist.push(readlistObject);
 
@@ -38,6 +56,26 @@ const addToCompleted = (id) => {
     if(book == null) return;
 
     book.isCompleted = true;
+    document.dispatchEvent(new Event(RENDER_EVENT));
+    saveData();
+}
+
+const undoFromComplete = (id) => {
+    const book = findReadlist(id);
+
+    if(book == null) return;
+
+    book.isCompleted = false;
+    document.dispatchEvent(new Event(RENDER_EVENT));
+    saveData();
+}
+
+const deleteBook = (id) => {
+    const bookIndex = findReadlistIndex(id);
+
+    if(bookIndex === -1) return;
+
+    readlist.splice(bookIndex, 1);
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
 }
@@ -124,6 +162,13 @@ const findReadlist = (id) => {
     }
     return null;
 };
+
+const findReadlistIndex = (id) => {
+    for (const index in readlist){
+        if(readlist[index].id === id) return index;
+    }
+    return -1;
+}
 
 const loadData = () => {
     const localData = localStorage.getItem(STORAGE_KEY);
