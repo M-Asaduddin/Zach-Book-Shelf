@@ -42,9 +42,14 @@ const addReadList = () => {
     const bookYear = document.getElementById('inputBookYear').value;
     const bookIsComplete = document.getElementById('inputBookIsComplete').value;
 
-    const readlistObject = generateReadList(+new Date(), bookTitle, bookAuthor, bookYear, false);
+    if(bookIsComplete){
+        const readlistObject = generateReadList(+new Date(), bookTitle, bookAuthor, bookYear, true);
+        readlist.push(readlistObject);
+    } else {
+        const readlistObject = generateReadList(+new Date(), bookTitle, bookAuthor, bookYear, false);
+        readlist.push(readlistObject);
+    }
 
-    readlist.push(readlistObject);
 
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
