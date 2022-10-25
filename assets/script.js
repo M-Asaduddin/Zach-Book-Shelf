@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const result = document.getElementById('search_result');
     const bookList = document.querySelector("#search_result > .book_shelf > .book_list");
     
-    searchForm.style.display = 'none';
     result.style.display = 'none';
 
     AddForm.addEventListener('submit', ()=>{
@@ -25,17 +24,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
     
     searchTrigger.addEventListener('click', ()=>{
         const icon = document.querySelector('#magnifier>path');
-        if(searchForm.style.display === 'none'){
-            document.body.style.overflowY = 'hidden';
-            searchForm.style.display = 'flex';
+        if(result.style.display === 'none'){
             result.style.display = 'flex';
+            document.body.style.overflowY = 'hidden';
             icon.setAttribute('d', 'M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z');
         } else {
-            document.body.style.overflowY = 'scroll';
-            searchForm.style.display = 'none';
             result.style.display = 'none';
+            document.body.style.overflowY = 'auto';
             icon.setAttribute('d', 'M 13 3 C 7.4889971 3 3 7.4889971 3 13 C 3 18.511003 7.4889971 23 13 23 C 15.396508 23 17.597385 22.148986 19.322266 20.736328 L 25.292969 26.707031 A 1.0001 1.0001 0 1 0 26.707031 25.292969 L 20.736328 19.322266 C 22.148986 17.597385 23 15.396508 23 13 C 23 7.4889971 18.511003 3 13 3 z M 13 5 C 17.430123 5 21 8.5698774 21 13 C 21 17.430123 17.430123 21 13 21 C 8.5698774 21 5 17.430123 5 13 C 5 8.5698774 8.5698774 5 13 5 z');
             bookList.innerHTML = "";
+            document.getElementById('searchBookTitle').value = '';
         }
 
     });
@@ -43,8 +41,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
     searchForm.addEventListener('submit', (event)=>{
         event.preventDefault();
         bookList.innerHTML = "";
-        const searchedBook = renderReadlist(searchTitle());
-        bookList.append(searchedBook);
+        const searchedBook = searchTitle();
+        if(searchedBook != null){
+            for(const book of searchedBook){
+                const renderedBook = renderReadlist(book);
+                bookList.append(renderedBook);
+            }
+        } else {
+            alert('Buku yang dicari tidak ditemukan!');
+        }
     });
 
     completeCheckBox.addEventListener('change', () => {
@@ -149,7 +154,14 @@ const renderReadlist = (book) => {
 
     deleteButton.addEventListener("click", () => {
         const isDelete = confirm(`Yakin Ingin Menghapus buku ${book.title} dari Bookshelf?`);
-        if(isDelete) deleteBook(book.id);
+        if(isDelete) {
+            deleteBook(book.id);
+            const bookList = document.querySelector("#search_result > .book_shelf > .book_list");
+            bookList.innerHTML = "";
+
+            const searchInput = document.getElementById('searchBookTitle');
+            searchInput.value = "";
+        }
     });
     
     if(book.isCompleted) {
@@ -186,15 +198,13 @@ const renderReadlist = (book) => {
 const searchTitle = () => {
     const searchedBook = document.getElementById('searchBookTitle').value.toLowerCase();
     const titleSplit = searchedBook.split(' ');
-    for(const book of readlist){
-        const bookTitleArray=  book.title.toLowerCase().split(' ');
-        for(const title of titleSplit){
-            if (bookTitleArray.includes(title)){
-                return book;
-            }
+    const books = readlist.filter(book =>{
+        for(const segment of titleSplit){
+            return book.title.toLowerCase().includes(segment);
         }
-    }
-    return alert('Buku yang dicari tidak ditemukan!');
+    });
+    if(books.length >0 ) return books;
+    return null;
 }
 
 const isStorageExist = () => {
