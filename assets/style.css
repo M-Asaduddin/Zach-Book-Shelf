@@ -30,7 +30,12 @@ header{
     display: flex;
     /* flex-direction: column; */
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+}
+
+.head_bar__title{
+    width: 60%;
+    text-align: right;
 }
 
 #magnifier{
@@ -209,4 +214,16 @@ main {
 .book_shelf > .book_list > .book_item > .action > .red {
     background-color: darkred;
     color: white;
+}
+
+#search_result > .book_shelf{
+    background-color: #00000093;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow-y: scroll;
 }
