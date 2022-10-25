@@ -10,10 +10,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const searchTrigger = document.getElementById('magnifier');
     const searchForm = document.getElementById('searchBook');
     const completeCheckBox = document.getElementById('inputBookIsComplete');
-    const spanText = document.querySelector('.input_section > form > button > span');
     const result = document.getElementById('search_result');
     const bookList = document.querySelector("#search_result > .book_shelf > .book_list");
-    
     result.style.display = 'none';
 
     AddForm.addEventListener('submit', ()=>{
@@ -29,18 +27,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
             document.body.style.overflowY = 'hidden';
             icon.setAttribute('d', 'M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z');
         } else {
+            bookList.innerHTML = "";
             result.style.display = 'none';
             document.body.style.overflowY = 'auto';
             icon.setAttribute('d', 'M 13 3 C 7.4889971 3 3 7.4889971 3 13 C 3 18.511003 7.4889971 23 13 23 C 15.396508 23 17.597385 22.148986 19.322266 20.736328 L 25.292969 26.707031 A 1.0001 1.0001 0 1 0 26.707031 25.292969 L 20.736328 19.322266 C 22.148986 17.597385 23 15.396508 23 13 C 23 7.4889971 18.511003 3 13 3 z M 13 5 C 17.430123 5 21 8.5698774 21 13 C 21 17.430123 17.430123 21 13 21 C 8.5698774 21 5 17.430123 5 13 C 5 8.5698774 8.5698774 5 13 5 z');
-            bookList.innerHTML = "";
             document.getElementById('searchBookTitle').value = '';
         }
 
     });
 
-    searchForm.addEventListener('submit', (event)=>{
-        event.preventDefault();
+    searchForm.addEventListener('RENDER_SEARCH', () => {
         bookList.innerHTML = "";
+
         const searchedBook = searchTitle();
         if(searchedBook != null){
             for(const book of searchedBook){
@@ -52,7 +50,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
         }
     });
 
+    searchForm.addEventListener('submit', (event)=>{
+        event.preventDefault();
+        searchForm.dispatchEvent(new Event('RENDER_SEARCH'));
+    });
+
     completeCheckBox.addEventListener('change', () => {
+        const spanText = document.querySelector('.input_section > form > button > span');
         if(completeCheckBox.checked){
             spanText.innerHTML = "Selesai Dibaca";
         } else {
@@ -83,6 +87,7 @@ document.addEventListener(RENDER_EVENT, ()=>{
     }
 });
 
+
 const addReadList = () => {
     const bookTitle = document.getElementById('inputBookTitle').value;
     const bookAuthor = document.getElementById('inputBookAuthor').value;
@@ -109,6 +114,8 @@ const addToCompleted = (id) => {
 
     book.isCompleted = true;
     document.dispatchEvent(new Event(RENDER_EVENT));
+    const searchForm = document.getElementById('searchBook');
+    searchForm.dispatchEvent(new Event('RENDER_SEARCH'));
     saveData();
 }
 
@@ -119,6 +126,8 @@ const undoFromComplete = (id) => {
 
     book.isCompleted = false;
     document.dispatchEvent(new Event(RENDER_EVENT));
+    const searchForm = document.getElementById('searchBook');
+    searchForm.dispatchEvent(new Event('RENDER_SEARCH'));
     saveData();
 }
 
@@ -129,6 +138,8 @@ const deleteBook = (id) => {
 
     readlist.splice(bookIndex, 1);
     document.dispatchEvent(new Event(RENDER_EVENT));
+    const searchForm = document.getElementById('searchBook');
+    searchForm.dispatchEvent(new Event('RENDER_SEARCH'));
     saveData();
 }
 
@@ -156,11 +167,6 @@ const renderReadlist = (book) => {
         const isDelete = confirm(`Yakin Ingin Menghapus buku ${book.title} dari Bookshelf?`);
         if(isDelete) {
             deleteBook(book.id);
-            const bookList = document.querySelector("#search_result > .book_shelf > .book_list");
-            bookList.innerHTML = "";
-
-            const searchInput = document.getElementById('searchBookTitle');
-            searchInput.value = "";
         }
     });
     
