@@ -7,10 +7,41 @@ const STORAGE_KEY = 'READ_LIST';
 
 document.addEventListener('DOMContentLoaded', ()=>{
     const AddForm = document.getElementById('inputBook');
+    const searchTrigger = document.getElementById('magnifier');
+    const searchForm = document.getElementById('searchBook');
+    const completeCheckBox = document.getElementById('inputBookIsComplete');
+    const spanText = document.querySelector('.input_section > form > button > span');
     
-    AddForm.addEventListener('submit', (event)=>{
-        event.preventDefault();
+    searchForm.style.display = 'none';
+
+    AddForm.addEventListener('submit', ()=>{
         addReadList();
+    });
+
+    
+    searchTrigger.addEventListener('click', ()=>{
+        const icon = document.querySelector('#magnifier>path');
+        if(searchForm.style.display === 'none'){
+            searchForm.style.display = 'flex';
+            icon.setAttribute('d', 'M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z');
+        } else {
+            searchForm.style.display = 'none';
+            icon.setAttribute('d', 'M 13 3 C 7.4889971 3 3 7.4889971 3 13 C 3 18.511003 7.4889971 23 13 23 C 15.396508 23 17.597385 22.148986 19.322266 20.736328 L 25.292969 26.707031 A 1.0001 1.0001 0 1 0 26.707031 25.292969 L 20.736328 19.322266 C 22.148986 17.597385 23 15.396508 23 13 C 23 7.4889971 18.511003 3 13 3 z M 13 5 C 17.430123 5 21 8.5698774 21 13 C 21 17.430123 17.430123 21 13 21 C 8.5698774 21 5 17.430123 5 13 C 5 8.5698774 8.5698774 5 13 5 z');
+        }
+
+    });
+
+    searchForm.addEventListener('submit', ()=>{
+        searchTitle();
+        searchTrigger.dispatchEvent(new Event('click'));
+    });
+
+    completeCheckBox.addEventListener('change', () => {
+        if(completeCheckBox.checked){
+            spanText.innerHTML = "Selesai Dibaca";
+        } else {
+            spanText.innerHTML = "Belum Selesai Dibaca";
+        }
     });
 
     if(isStorageExist()){
@@ -40,9 +71,9 @@ const addReadList = () => {
     const bookTitle = document.getElementById('inputBookTitle').value;
     const bookAuthor = document.getElementById('inputBookAuthor').value;
     const bookYear = document.getElementById('inputBookYear').value;
-    const bookIsComplete = document.getElementById('inputBookIsComplete').value;
+    const bookIsComplete = document.getElementById('inputBookIsComplete');
 
-    if(bookIsComplete){
+    if(bookIsComplete.checked){
         const readlistObject = generateReadList(+new Date(), bookTitle, bookAuthor, bookYear, true);
         readlist.push(readlistObject);
     } else {
@@ -106,7 +137,8 @@ const renderReadlist = (book) => {
     deleteButton.innerText = "Hapus buku";
 
     deleteButton.addEventListener("click", () => {
-        deleteBook(book.id);
+        const isDelete = confirm(`Yakin Ingin Menghapus buku ${book.title} dari Bookshelf?`);
+        if(isDelete) deleteBook(book.id);
     });
     
     if(book.isCompleted) {
@@ -138,6 +170,20 @@ const renderReadlist = (book) => {
     bookItem.setAttribute('id', `read-${book.id}`);
 
     return bookItem;
+}
+
+const searchTitle = () => {
+    const searchedBook = document.getElementById('searchBookTitle').value.toLowerCase();
+    const titleSplit = searchedBook.split(' ');
+    for(const book of readlist){
+        const bookTitleArray=  book.title.toLowerCase().split(' ');
+        for(const title of titleSplit){
+            if (bookTitleArray.includes(title)){
+                return location.href = `#read-${book.id}`;
+            }
+        }
+    }
+    alert('Buku yang dicari tidak ditemukan!');
 }
 
 const isStorageExist = () => {
