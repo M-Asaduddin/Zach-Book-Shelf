@@ -49,25 +49,27 @@ header{
 }
 
 main {
-    max-width: 800px;
-    width: 80%;
-    margin: 0 auto;
-    padding: 16px;
-
+    width: 100%;
+    /* height: 100%; */
+    background-color: #466aac;
 }
 
 .input_section {
-    display: flex;
+    color: white;
     flex-direction: column;
-    padding: 10%;
+    padding: 5% 10%;
+    width: 100%;
+    height: 100%;
     border-radius: 10px;
     box-shadow: 0 5px 5px 3px #00000033;
-    margin: 10% 0;
+    background-color: #2d446ed8;
+    position: fixed;
+    top: -110%;
+    transition: 0.5s;
 }
 
 .input_section > h2 {
     text-align: center;
-    color: #612b85;
 }
 
 .input_section > form > .input {
@@ -102,11 +104,10 @@ main {
     border-radius: 5px;
     border-width: 0;
     outline: none;
-    background-color: #ccdadd94;
+    background-color: #ccdadd;
 }
 
 .input_section > form > .input > label {
-    color: #612b85;
     font-weight: bold;
 }
 
@@ -117,26 +118,20 @@ main {
 }
 
 .input_section > form > .input_inline > label {
-    color: #612b85;
     font-weight: bold;
     margin-right: 10px;
 }
 
 .search_section {
-    /* margin: 0 5% ; */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 0 5%;
-    border-radius: 10px;
     width: 100%;
+    background-color: #fffaf5;
 }
 
-#searchBook{
-    transition: 0.5s;
-    width: 80%;
-}
 
 .search_section > form {
     padding: 16px;
@@ -175,24 +170,30 @@ main {
 .search_section > form > button:hover{
     transform: scale(1.3);
 }
+
 .book_shelf {
-    margin: 10% 0;
-    padding: 10% 3%;
-    border-radius: 10px;
-    box-shadow: 0 5px 5px 3px #00000033;
-    background-color: cornflowerblue;
-    color: white;
+    margin-bottom: 1%;
+    padding: 5% 3%;
+    width: 100%;
+    background-color: #fffaf5;
+    color: #537cc9;
 }
 
 .book_shelf > .book_list {
-    padding: 16px;
+    padding: 2% 0;
+    display: grid;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    /* row-gap: 5%; */
 }
 
 .book_shelf > .book_list > .book_item {
     padding: 5% 10%;
     box-shadow: 0 5px 5px 3px #00000033;
     border-radius: 5px;
-    margin: 5% 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 5%;
     background-color: white;
     color: #612b85;
 }
@@ -203,15 +204,22 @@ main {
 
 .book_shelf > .book_list > .book_item > .action > button {
     border: 0;
-    padding:2% 3%;
-    margin: 0 5px 0 0;
+    padding:5% 0;
+    margin: 3% 2%;
+    width: 100%;
     border-radius: 5px;
     cursor: pointer;
+    transition: 0.5s;
 }
 
 .book_shelf > .book_list > .book_item > .action > .green {
-    background-color: darkgreen;
+    background-color:rgb(82, 123, 197);
     color: white;
+}
+
+.book_shelf > .book_list > .book_item > .action > .green:hover{
+    background-color: #ebebeb;
+    color: #537cc9;
 }
 
 .book_shelf > .book_list > .book_item > .action > .red {
@@ -219,46 +227,58 @@ main {
     color: white;
 }
 
-#search_result{
-    z-index: 2;
-    /* position: fixed; */
-    top: 0;
-    width: 100%;
-    /* overflow-y: scroll; */
+.book_shelf > .book_list > .book_item > .action > .red:hover{
+    background-color: #ebebeb;
+    color: darkred;
 }
 
-#search_result > .book_shelf{
-    margin: 0;
-    padding: 5%;
-    width: 100%;
-    height: 100%;
-    background-color: #000000cc;
+#add-button{
+    transform-origin: 50% 50%;
     position: fixed;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    overflow-y: scroll;
+    top: 80%;
+    left: 90%;
+    border: 0;
+    background-color: #00000000;
+    transition: 0.5s;
 }
 
-@media screen and (max-width : 500px) {
-    main{
-        margin: 0 5%;
-        width: 90%;
-    }
+
+@media screen and (max-width : 800px){
     .head_bar__title{
         width: max-content;
         text-align: center;
     }
 
+    #add-button{
+        left: 80%;
+    }
+    .book_shelf > .book_list{
+        grid-template-columns: 25% 25% 25% 25% ;
+    }
+}
+
+@media screen and (max-width : 600px){
+    .book_shelf > .book_list{
+        grid-template-columns: 50% 50%;
+    }
+
+}
+
+@media screen and (max-width : 400px) {    
     .search_section{
         width: 100%;
-        /* margin: 0 auto; */
+    }
+
+    .book_shelf{
+        height: max-content;
+        /* padding: 10% 0; */
+    }
+
+    .book_shelf > .book_list{
+        grid-template-columns: 100% ;
     }
     
-    #searchBook{
-        width: 100%;
-        padding: 0 2%;
-        margin: 0 auto;
+    #add-button{
+        left: 70%;
     }
 }

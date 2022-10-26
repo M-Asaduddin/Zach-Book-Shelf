@@ -10,49 +10,57 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const searchTrigger = document.getElementById('magnifier');
     const searchForm = document.getElementById('searchBook');
     const completeCheckBox = document.getElementById('inputBookIsComplete');
-    const result = document.getElementById('search_result');
-    const bookList = document.querySelector("#search_result > .book_shelf > .book_list");
-    result.style.display = 'none';
+    const addButton = document.getElementById('add-button');
+    
+    searchForm.style.display = 'none';
+
+    addButton.style.transform = 'rotate(90deg)'
 
     AddForm.addEventListener('submit', ()=>{
-
         addReadList();
     });
 
     
     searchTrigger.addEventListener('click', ()=>{
         const icon = document.querySelector('#magnifier>path');
-        if(result.style.display === 'none'){
-            result.style.display = 'flex';
-            document.body.style.overflowY = 'hidden';
+        const completed = document.getElementById("selesai");
+        if(searchForm.style.display === 'none'){
+            const label = document.querySelector('.book_shelf > h2');
+            label.innerHTML = "Hasil Pencarian";
+            completed.style.display = 'none';
+
+            document.dispatchEvent(new Event('RENDER_SEARCH'));
+            searchForm.style.display = 'flex';
             icon.setAttribute('d', 'M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z');
         } else {
-            bookList.innerHTML = "";
-            result.style.display = 'none';
-            document.body.style.overflowY = 'auto';
+            completed.style.display = 'grid';
+            searchForm.style.display = 'none';
             icon.setAttribute('d', 'M 13 3 C 7.4889971 3 3 7.4889971 3 13 C 3 18.511003 7.4889971 23 13 23 C 15.396508 23 17.597385 22.148986 19.322266 20.736328 L 25.292969 26.707031 A 1.0001 1.0001 0 1 0 26.707031 25.292969 L 20.736328 19.322266 C 22.148986 17.597385 23 15.396508 23 13 C 23 7.4889971 18.511003 3 13 3 z M 13 5 C 17.430123 5 21 8.5698774 21 13 C 21 17.430123 17.430123 21 13 21 C 8.5698774 21 5 17.430123 5 13 C 5 8.5698774 8.5698774 5 13 5 z');
             document.getElementById('searchBookTitle').value = '';
+            document.dispatchEvent(new Event(RENDER_EVENT));
         }
-
+        
     });
-
-    searchForm.addEventListener('RENDER_SEARCH', () => {
-        bookList.innerHTML = "";
-
-        const searchedBook = searchTitle();
-        if(searchedBook != null){
-            for(const book of searchedBook){
-                const renderedBook = renderReadlist(book);
-                bookList.append(renderedBook);
-            }
+    
+    addButton.addEventListener('click', () => {
+        const inputSection = document.querySelector('.input_section');
+        if(addButton.style.transform == 'rotate(90deg)'){
+            document.body.style.overflowY = 'hidden';
+            inputSection.style.top = '0';
+            addButton.style.transform = 'rotate(45deg)';
         } else {
-            alert('Buku yang dicari tidak ditemukan!');
+            document.body.style.overflowY = 'scroll';
+            inputSection.style.top = '-110%';
+            addButton.style.transform = 'rotate(90deg)';
         }
     });
 
+    
     searchForm.addEventListener('submit', (event)=>{
         event.preventDefault();
-        searchForm.dispatchEvent(new Event('RENDER_SEARCH'));
+        const inputSection = document.querySelector('.input_section');
+        inputSection.style.top = '-100%';
+        document.dispatchEvent(new Event('RENDER_SEARCH'));
     });
 
     completeCheckBox.addEventListener('change', () => {
@@ -69,7 +77,30 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
 });
 
+document.addEventListener('RENDER_SEARCH', () => {
+    const label = document.querySelector('.book_shelf > h2');
+    const incompleted = document.getElementById("incompleteBookshelfList");
+
+    label.innerHTML = "Hasil Pencarian";
+
+    incompleted.innerHTML = "";
+
+    const searchedBook = searchTitle();
+    if(searchedBook != null){
+        console.log(searchedBook);
+        for(const book of searchedBook){
+            const renderedBook = renderReadlist(book);
+            incompleted.append(renderedBook);
+        }
+    } else {
+        alert('Buku yang dicari tidak ditemukan!');
+    }
+});
+
 document.addEventListener(RENDER_EVENT, ()=>{
+    const label = document.querySelector('.book_shelf > h2');
+    label.innerText = "Belum Selesai Dibaca";
+
     const incompleted = document.getElementById("incompleteBookshelfList");
     incompleted.innerHTML = '';
 
@@ -144,8 +175,12 @@ const deleteBook = (id) => {
 }
 
 const renderReadlist = (book) => {
+
     const bookItem = document.createElement("article");
     bookItem.classList.add('book_item');
+
+    const textContainer = document.createElement("div");
+    textContainer.classList.add('text_container');
 
     const bookTitle = document.createElement("h3");
     bookTitle.innerText = book.title;
@@ -156,8 +191,11 @@ const renderReadlist = (book) => {
     const bookYear = document.createElement("p");
     bookYear.innerText = `Tahun : ${book.year}`;
 
+    textContainer.append(bookTitle, bookAuthor, bookYear);
+
     const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("action");
+    
     
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("red");
@@ -195,7 +233,7 @@ const renderReadlist = (book) => {
 
     buttonContainer.append(deleteButton);
 
-    bookItem.append(bookTitle, bookAuthor, bookYear, buttonContainer);
+    bookItem.append(textContainer, buttonContainer);
     bookItem.setAttribute('id', `read-${book.id}`);
 
     return bookItem;
