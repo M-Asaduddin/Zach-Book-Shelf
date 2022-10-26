@@ -87,7 +87,6 @@ document.addEventListener('RENDER_SEARCH', () => {
 
     const searchedBook = searchTitle();
     if(searchedBook != null){
-        console.log(searchedBook);
         for(const book of searchedBook){
             const renderedBook = renderReadlist(book);
             incompleted.append(renderedBook);
